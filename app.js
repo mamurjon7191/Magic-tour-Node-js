@@ -8,7 +8,7 @@ const morgan = require('morgan');
 
 app.use(express.json()); // Middleware qorovulcha
 
-app.use(morgan('common'));
+app.use(morgan('dev'));
 
 app.use((req, res, next) => {
   req.requestDate = new Date();
@@ -19,5 +19,6 @@ app.use((req, res, next) => {
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
-const port = 8000;
-app.listen(port, '127.0.0.1');
+module.exports = app;
+
+app.use(express.static(`${__dirname}/public`));
