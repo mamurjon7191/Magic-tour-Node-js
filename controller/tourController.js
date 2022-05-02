@@ -7,9 +7,11 @@ const tours = JSON.parse(
 );
 
 const getToursAll = (req, res) => {
+  console.log(req.requestDate);
   res.status(200).json({
     status: 'Success',
     data: {
+      requested: req.requestDate,
       tours,
     },
   });

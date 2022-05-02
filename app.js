@@ -11,10 +11,9 @@ app.use(express.json()); // Middleware qorovulcha
 app.use(morgan('common'));
 
 app.use((req, res, next) => {
-  req.time = Date.now();
+  req.requestDate = new Date();
   next();
 });
-
 // App Users routing
 
 app.use('/api/v1/tours', tourRouter);
