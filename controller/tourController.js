@@ -1,90 +1,52 @@
-const fs = require('fs');
-
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`, {
-    encoding: 'utf-8',
-  })
-);
+const Tour = require('../model/tourModel.js');
 
 const getToursAll = (req, res) => {
   res.status(200).json({
     status: 'Success',
     data: {
-      requested: req.requestDate,
       tours,
     },
   });
 };
-const addTour = (req, res) => {
-  const data = req.body;
-  const newId = tours[tours.length - 1].id + 1;
-  const completeObj = Object.assign({ id: newId }, data);
+const addTour = async (req, res) => {
+  // assinxron funcsiya ishlatdikmmi try,catchni ishlatamiz
+  try {
+    // malumotni databasega yozish
 
-  tours.push(completeObj);
+    // const tourModel = new Tour(req.body);
+    // const data = await tourModel.save();
+    // console.log(data);
 
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    'utf-8',
-    (err) => {
-      res.status(201).json({
-        status: 'success',
-        data: {
-          tour: completeObj,
-        },
-      });
-    }
-  );
+    //2-usul
+    const data = await Tour.create(req.body);
+
+    res.status(201).json({
+      status: 'success',
+      data: data,
+    });
+  } catch (err) {
+    res.status(404).json({
+      message: 'Invalid data',
+    });
+  }
 };
 
 const getTourItem = (req, res) => {
-  const id = +req.params.id;
-  const data = tours.find((val) => val.id === id);
-
-  if (data) {
-    res.status(200).json({
-      status: 'success',
-      timeReq: req.time,
-      timeRes: res.time,
-      data: {
-        data,
-      },
-    });
-  }
-  // if (req.params.id > tours.length) {
-  //   res.status(404).json({
-  //     status: 'Failed',
-  //     data: 'Invalid Id entered',
-  //   });
-  // }
+  res.status(200).json({
+    status: 'success',
+    data: {
+      data,
+    },
+  });
 };
 
-const updateTour = (req, res) => {
-  const id = +req.params.id;
-  const data = tours.find((val) => val.id === id);
-};
+const updateTour = (req, res) => {};
 
 const deleteTour = (req, res) => {
-  // if (req.params.id > tours.length) {
-  //   res.status(404).json({
-  //     status: 'Failed',
-  //     data: 'Invalid Id entered',
-  //   });
-  // }
-  const id = +req.params.id;
-  const arr = tours.filter((val) => val.id != id);
-
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(arr),
-    'utf-8',
-    (err) => {
-      res.status(204).json({
-        status: 'success',
-        data: 'Malumot uchirildi',
-      });
-    }
-  );
+  res.status(204).json({
+    status: 'success',
+    data: 'Malumot uchirildi',
+  });
 };
 
 /////////////////////////////////////////

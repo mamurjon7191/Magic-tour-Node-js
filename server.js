@@ -14,17 +14,16 @@ app.listen(port, '127.0.0.1');
 // console.log(process.env); //-->glabal ozgaruvchilar royhati
 
 //mongooseni ishlatish
+
 const DB = process.env.DATABASE.replace(
   '<password>',
   process.env.DATABASE_PASSWORD
 );
-mongoose
-  .connect(DB, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-  })
-  .then((con) => {
-    console.log(con.connections);
-    console.log(`DB connection is succesfull`);
-  });
+
+mongoose.connect(DB, {}).then(() => {
+  console.log('DB connection succesful');
+});
+
+// sxema yaratib olish
+
+////////////////////////////////////////////
