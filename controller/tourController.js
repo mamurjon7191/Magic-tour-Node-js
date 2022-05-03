@@ -1,18 +1,29 @@
 const Tour = require('../model/tourModel.js');
 
-const getToursAll = (req, res) => {
-  res.status(200).json({
-    status: 'Success',
-    data: {
-      tours,
-    },
-  });
+const getToursAll = async (req, res) => {
+  try {
+    ////////////////////////////////////
+    const data = await Tour.find();
+    ////////////////////////////////////
+    res.status(200).json({
+      status: 'Success',
+      results: data.length,
+      data: {
+        data,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: 'There is not data',
+    });
+  }
 };
 const addTour = async (req, res) => {
   // assinxron funcsiya ishlatdikmmi try,catchni ishlatamiz
   try {
     // malumotni databasega yozish
-
+    //1-usul
     // const tourModel = new Tour(req.body);
     // const data = await tourModel.save();
     // console.log(data);
@@ -31,38 +42,58 @@ const addTour = async (req, res) => {
   }
 };
 
-const getTourItem = (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    data: {
-      data,
-    },
-  });
-};
-
-const updateTour = (req, res) => {};
-
-const deleteTour = (req, res) => {
-  res.status(204).json({
-    status: 'success',
-    data: 'Malumot uchirildi',
-  });
-};
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-
-const checkId = function (req, res, next, val) {
-  console.log(`Tour ID is : ${val}`);
-  if (val > tours.length) {
-    return res.status(404).json({
-      status: 'Failed',
-      data: 'Invalid Id entered',
+const getTourItem = async (req, res) => {
+  try {
+    console.log(req.params.id);
+    const data = await Tour.findById(req.body.id);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        data,
+      },
+    });
+  } catch {
+    res.status(404).json({
+      message: 'Invalid data id',
     });
   }
-  next();
 };
+
+const updateTour = async (req, res) => {
+  try {
+    const data = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      status: 'success',
+      data: data,
+    });
+  } catch {
+    res.status(404).json({
+      status: 'Failed',
+      message: 'Updated Error',
+    });
+  }
+};
+
+const deleteTour = async (req, res) => {
+  try {
+    const data = await Tour.findByIdAndDelete(req.params.id);
+    res.status(200).json({
+      data: data,
+    });
+  } catch {
+    res.status(404).json({
+      status: 'Failed',
+      message: 'Updated Error',
+    });
+  }
+};
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
 
 module.exports = {
   getToursAll,
@@ -70,5 +101,4 @@ module.exports = {
   updateTour,
   deleteTour,
   getTourItem,
-  checkId,
 };

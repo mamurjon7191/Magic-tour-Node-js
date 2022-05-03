@@ -1,9 +1,9 @@
 // database bn ulash uchun
-const mongoose = require('mongoose');
 
 // glabal ozgaruvchilarni tanish uchun
 const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' });
+const mongoose = require('mongoose');
 // appni require qivoldik
 const app = require('./app.js');
 //bulani bilamiz
