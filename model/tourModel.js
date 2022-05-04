@@ -26,7 +26,7 @@ const tourScheme = new mongoose.Schema({
   },
   ratingsQuantity: {
     type: Number,
-    require: [true, 'Siz ratingQuantityni kiritishingiz shart'],
+    required: [true, 'Siz ratingQuantityni kiritishingiz shart'],
     default: 0,
   },
   price: {
