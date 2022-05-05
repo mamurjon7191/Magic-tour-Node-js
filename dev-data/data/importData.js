@@ -48,7 +48,6 @@ if (process.argv[2] === '--add') {
 } else if (process.argv[2] === '--delete') {
   deleteData();
 }
-// console.log(process.argv);
 
 const addDataUser = User.create(dataUser).then(() => {
   console.log('userga malumotlar qoshildi');

@@ -2,23 +2,46 @@ const Tour = require('../model/tourModel.js');
 
 const getToursAll = async (req, res) => {
   try {
+    const query = { ...req.query };
+    console.log(req.query);
+    const removeQuery = ['sort', 'page', 'limit', 'field'];
+    removeQuery.forEach((val) => delete query[val]);
+    const queryStr = JSON.stringify(query)
+      .replace(/\bgt\b/g, '$gt')
+      .replace(/\blt\b/g, '$lt')
+      .replace(/\bgte\b/g, '$gte')
+      .replace(/\blte\b/g, '$lte');
     ////////////////////////////////////
-    const data = await Tour.find();
     ////////////////////////////////////
-    res.status(200).json({
-      status: 'Success',
-      results: data.length,
-      data: {
-        data,
-      },
-    });
+    // console.log(queryStr);
+
+    let data = Tour.find(JSON.parse(queryStr));
+    if (req.query.sort) {
+      const querySort = req.query.sort.split(',').join(' ');
+      console.log(querySort);
+      data = data.sort(querySort);
+    }
+    const queryData = await data;
+    if (queryData.length) {
+      res.status(200).json({
+        status: 'Success',
+        results: queryData.length,
+        data: {
+          queryData,
+        },
+      });
+    } else {
+      throw new Error();
+    }
   } catch (err) {
+    console.log(err);
     res.status(404).json({
       status: 'fail',
-      message: 'There is not data',
+      message: 'invalid data',
     });
   }
 };
+
 const addTour = async (req, res) => {
   // assinxron funcsiya ishlatdikmmi try,catchni ishlatamiz
   try {
@@ -41,7 +64,6 @@ const addTour = async (req, res) => {
     });
   }
 };
-
 const getTourItem = async (req, res) => {
   try {
     console.log(req.params.id);
