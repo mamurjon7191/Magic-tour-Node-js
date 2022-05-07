@@ -50,6 +50,7 @@ const tourScheme = new mongoose.Schema({
   images: [String],
   startDates: [Date],
   createAt: {
+    select: false, // post qisa boladi lekin get qisa createAtni olib kelmaydi !!!!
     type: Date,
     default: Date.now(),
   },

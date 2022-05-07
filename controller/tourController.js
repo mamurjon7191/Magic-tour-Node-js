@@ -2,8 +2,8 @@ const Tour = require('../model/tourModel.js');
 
 const getToursAll = async (req, res) => {
   try {
+    // filter
     const query = { ...req.query };
-    console.log(req.query);
     const removeQuery = ['sort', 'page', 'limit', 'field'];
     removeQuery.forEach((val) => delete query[val]);
     const queryStr = JSON.stringify(query)
@@ -12,15 +12,42 @@ const getToursAll = async (req, res) => {
       .replace(/\bgte\b/g, '$gte')
       .replace(/\blte\b/g, '$lte');
     ////////////////////////////////////
-    ////////////////////////////////////
     // console.log(queryStr);
 
     let data = Tour.find(JSON.parse(queryStr));
+
+    //<----sort qilish---->\\
     if (req.query.sort) {
       const querySort = req.query.sort.split(',').join(' ');
-      console.log(querySort);
+      console.log(typeof querySort);
       data = data.sort(querySort);
     }
+    //////////////////////////////////////
+    // <----fieldlar----> \\
+    if (req.query.field) {
+      const queryField = req.query.field.split(',').join(' ');
+      data = data.select(queryField);
+      console.log(req.query.field);
+    } else {
+      data = data.select('-__v');
+    }
+    ///////////////////////////////////////
+    // <----pagination----> \\
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 1;
+
+    const skip = (page - 1) * limit;
+
+    data = data.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const numberOfDocuments = await Tour.countDocuments();
+      console.log(numberOfDocuments);
+      if (numberOfDocuments < skip) {
+        throw new Error('This page is not exist');
+      }
+    }
+    ///////////////////////////////////////////
     const queryData = await data;
     if (queryData.length) {
       res.status(200).json({
@@ -37,7 +64,7 @@ const getToursAll = async (req, res) => {
     console.log(err);
     res.status(404).json({
       status: 'fail',
-      message: 'invalid data',
+      message: err.message,
     });
   }
 };
