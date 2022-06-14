@@ -1,60 +1,25 @@
 const Tour = require('../model/tourModel.js');
+const ApiFeatures = require('../helper/APIFeatures.js');
+
+// const getThreeBestTour = async (req, res) => {};
 
 const getToursAll = async (req, res) => {
   try {
-    // filter
-    const query = { ...req.query };
-    const removeQuery = ['sort', 'page', 'limit', 'field'];
-    removeQuery.forEach((val) => delete query[val]);
-    const queryStr = JSON.stringify(query)
-      .replace(/\bgt\b/g, '$gt')
-      .replace(/\blt\b/g, '$lt')
-      .replace(/\bgte\b/g, '$gte')
-      .replace(/\blte\b/g, '$lte');
-    ////////////////////////////////////
-    // console.log(queryStr);
+    const numberOfDocuments = await Tour.countDocuments();
 
-    let data = Tour.find(JSON.parse(queryStr));
+    const apiBolasi = new ApiFeatures(req.query, Tour).filter().sort().field();
+    // .pagination(numberOfDocuments);
 
-    //<----sort qilish---->\\
-    if (req.query.sort) {
-      const querySort = req.query.sort.split(',').join(' ');
-      console.log(typeof querySort);
-      data = data.sort(querySort);
-    }
-    //////////////////////////////////////
-    // <----fieldlar----> \\
-    if (req.query.field) {
-      const queryField = req.query.field.split(',').join(' ');
-      data = data.select(queryField);
-      console.log(req.query.field);
-    } else {
-      data = data.select('-__v');
-    }
-    ///////////////////////////////////////
-    // <----pagination----> \\
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 1;
+    const data = await apiBolasi.sorovniYegish;
 
-    const skip = (page - 1) * limit;
+    /////////////////////_-|_{='_'=}_|-_//////////////////////
 
-    data = data.skip(skip).limit(limit);
-
-    if (req.query.page) {
-      const numberOfDocuments = await Tour.countDocuments();
-      console.log(numberOfDocuments);
-      if (numberOfDocuments < skip) {
-        throw new Error('This page is not exist');
-      }
-    }
-    ///////////////////////////////////////////
-    const queryData = await data;
-    if (queryData.length) {
+    if (data.length) {
       res.status(200).json({
         status: 'Success',
-        results: queryData.length,
+        results: data.length,
         data: {
-          queryData,
+          data,
         },
       });
     } else {
@@ -142,6 +107,28 @@ const deleteTour = async (req, res) => {
 
 /////////////////////////////////////////
 /////////////////////////////////////////
+const stats = async (req, res) => {
+  try {
+    const data = await Tour.aggregate([
+      { $match: { ratingsAverage: { $gte: 4.7 } } }, // match filterga oxshab ketadi
+      {
+        $group: {
+          id: {},
+          averagePrice: { $Avg: '$price' },
+        },
+      },
+    ]);
+    res.status(200).json({
+      status: 'sucess',
+      data: data,
+    });
+  } catch (err) {
+    res.stats(fail).json({
+      message: err,
+    });
+  }
+};
+
 /////////////////////////////////////////
 
 module.exports = {
@@ -150,4 +137,5 @@ module.exports = {
   updateTour,
   deleteTour,
   getTourItem,
+  stats,
 };

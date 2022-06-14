@@ -5,8 +5,10 @@ const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' });
 const mongoose = require('mongoose');
 // appni require qivoldik
+
 const app = require('./app.js');
 //bulani bilamiz
+
 const port = process.env.PORT;
 app.listen(port, '127.0.0.1');
 
